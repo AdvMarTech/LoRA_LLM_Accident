@@ -1,0 +1,59 @@
+### ===========================================
+### LLamaFactory LoRA SFT 配置文件（最终优化版）
+### 适用于：48条小数据集微调 Qwen2.5-7B-Instruct
+### val_size: 0.2 (20% 验证集，约10条)
+### ===========================================
+
+### model
+model_name_or_path: /mnt/data/LLM/models/Qwen/Qwen2.5-7B-Instruct
+trust_remote_code: true
+
+### method
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_rank: 16
+lora_alpha: 32
+lora_dropout: 0.1
+lora_target: all
+
+### dataset
+### 关键修改：指定dataset_info.json所在目录的绝对路径
+dataset_dir: /home/jun/Documents/LLM/LLaMA-Factory/data
+dataset: identity
+template: qwen
+cutoff_len: 2048
+max_samples: 1000
+overwrite_cache: true
+preprocessing_num_workers: 16
+dataloader_num_workers: 4
+
+### output
+output_dir: /mnt/data/LLM/outputs/Qwen2.5-7B-Instruct/lora/sft0727
+logging_steps: 1
+plot_loss: true
+overwrite_output_dir: true
+save_only_model: false
+
+### train
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 4
+learning_rate: 2.0e-5
+num_train_epochs: 30
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 180000000
+resume_from_checkpoint: null
+max_grad_norm: 1.0
+weight_decay: 0.01
+
+### eval - 使用epoch策略（关键修改）
+val_size: 0.2
+per_device_eval_batch_size: 1
+eval_strategy: epoch
+save_strategy: epoch
+load_best_model_at_end: true
+metric_for_best_model: eval_loss
+greater_is_better: false
+save_total_limit: 5
